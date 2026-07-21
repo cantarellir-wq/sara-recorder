@@ -35,6 +35,21 @@
  font-weight: 500;
  }
 
+ .tips {
+ margin-bottom: 32px;
+ padding: 16px;
+ background: rgba(232, 102, 75, 0.08);
+ border-left: 4px solid #E8664B;
+ border-radius: 6px;
+ text-align: left;
+ font-size: 13px;
+ color: #333;
+ line-height: 1.6;
+ }
+ .tips strong { display: block; margin-bottom: 10px; color: #E8664B; font-weight: 600; }
+ .tips ol { margin: 0; padding-left: 20px; }
+ .tips li { margin-bottom: 6px; }
+
  .record-section { margin-bottom: 32px; }
 
  .btn-record {
@@ -103,19 +118,6 @@
  text-align: left;
  }
 
- .instructions {
- padding: 20px;
- background: rgba(0, 0, 0, 0.02);
- border-radius: 8px;
- font-size: 13px;
- color: #666;
- line-height: 1.6;
- text-align: left;
- }
- .instructions strong { display: block; margin-bottom: 8px; color: #333; }
- .instructions ol { margin: 0; padding-left: 20px; }
- .instructions li { margin-bottom: 4px; }
-
  .footer { font-size: 12px; color: #999; margin-top: 32px; }
  </style>
 </head>
@@ -125,6 +127,17 @@
  <h1>Sara Registratore Vocale</h1>
  <p>Descrivi il momento mentre accade</p>
  <span class="educator-badge" id="educatorBadge"></span>
+ </div>
+
+ <div class="tips">
+ <strong>💡 CONSIGLI RAPIDI</strong>
+ <ol>
+ <li><strong>Parla in diretta</strong> mentre le cose accadono — come una radiocronaca.</li>
+ <li><strong>Descrivi il contesto:</strong> dove sei (casa/centro), che ora è, cosa c'è attorno.</li>
+ <li><strong>Descrivi cosa vedi:</strong> reazioni, suoni, movimenti di Sara.</li>
+ <li><strong>Parla il minimo,</strong> lascia spazio ai vocalizzi di Sara — sono la parte più preziosa.</li>
+ <li><strong>Anche pochi minuti sono utili</strong> — non aspettare la fine dell'attività.</li>
+ </ol>
  </div>
 
  <div class="record-section">
@@ -138,39 +151,22 @@
  <div id="error" class="error"></div>
  <div id="warning" class="warning" style="display:none"></div>
 
- <div class="instructions">
- <strong>Come usare:</strong>
- <ol>
- <li>Premi il pulsante rosso per avviare</li>
- <li>Descrivi quello che stai facendo con Sara</li>
- <li>Premi il quadrato per finire</li>
- <li>Il file si salva da solo — nient'altro da fare</li>
- </ol>
- </div>
-
  <p class="footer">Versione 5.1 · Sara Recorder</p>
  </div>
 
  <script>
- // ============================================
- // CONFIGURAZIONE
- // ============================================
  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygrMAaFAriearxpO1A248aueVhbD9mEeVwJXbDMJhuNAF63LGfRCgqAO-lAkaS-ij8/exec';
  const SHARED_SECRET = 'sara2026';
- // ============================================
 
- // Legge l'ID educatore dall'URL (?id=mario)
  const urlParams = new URLSearchParams(window.location.search);
  const educatorId = urlParams.get('id') || '';
 
- // Mostra il badge con il nome educatore (se presente)
  const badge = document.getElementById('educatorBadge');
  if (educatorId) {
  badge.textContent = '👤 ' + educatorId;
  badge.style.display = 'inline-block';
  } else {
  badge.style.display = 'none';
- // Avvisa che manca l'ID
  const warn = document.getElementById('warning');
  warn.style.display = 'block';
  warn.textContent = '⚠️ Link senza ID educatore — il file verrà salvato senza nome. Usa il link personale che ti è stato inviato.';
@@ -192,7 +188,6 @@
  async function startRecording() {
  clearError();
  try {
- // Richiedi Screen Wake Lock per mantenere lo schermo acceso
  if ('wakeLock' in navigator) {
  try {
  wakeLock = await navigator.wakeLock.request('screen');
