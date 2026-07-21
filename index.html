@@ -1,369 +1,421 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="theme-color" content="#E8664B">
- <title>Sara Registratore Vocale</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#E8664B">
+  <title>Sara Registratore Vocale</title>
 
- <style>
- * { margin: 0; padding: 0; box-sizing: border-box; }
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
- body {
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
- background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
- min-height: 100vh;
- display: flex;
- align-items: center;
- justify-content: center;
- padding: 20px;
- }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
- .container { max-width: 400px; width: 100%; text-align: center; }
+    .container { max-width: 420px; width: 100%; text-align: center; }
 
- .header { margin-bottom: 40px; }
- .header h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
- .header p { font-size: 14px; color: #666; }
- .header .educator-badge {
- display: inline-block;
- margin-top: 10px;
- padding: 4px 12px;
- background: rgba(232, 102, 75, 0.1);
- border-radius: 20px;
- font-size: 13px;
- color: #E8664B;
- font-weight: 500;
- }
+    .header { margin-bottom: 30px; }
+    .header h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+    .header p { font-size: 14px; color: #666; }
+    .header .educator-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 12px;
+      background: rgba(232, 102, 75, 0.1);
+      border-radius: 20px;
+      font-size: 13px;
+      color: #E8664B;
+      font-weight: 500;
+    }
 
- .record-section { margin-bottom: 32px; }
+    .quick-tips {
+      background: #fafaf8;
+      border: 1px solid #e8e6e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
 
- .btn-record {
- width: 160px;
- height: 160px;
- border-radius: 50%;
- border: none;
- background: #E8664B;
- color: white;
- font-size: 56px;
- cursor: pointer;
- display: flex;
- align-items: center;
- justify-content: center;
- margin: 0 auto;
- transition: all 0.3s;
- box-shadow: 0 4px 16px rgba(232, 102, 75, 0.25);
- }
- .btn-record:disabled { opacity: 0.4; cursor: not-allowed; }
- .btn-record.recording {
- width: 140px; height: 140px;
- box-shadow: 0 8px 24px rgba(232, 102, 75, 0.4), 0 0 0 12px rgba(232, 102, 75, 0.1);
- }
+    .quick-tips-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
- .timer {
- margin-top: 24px;
- font-size: 32px;
- font-weight: 600;
- color: #E8664B;
- font-variant-numeric: tabular-nums;
- min-height: 40px;
- }
+    .quick-tips-title::before {
+      content: "💡";
+      font-size: 14px;
+    }
 
- .status {
- padding: 12px;
- background: rgba(74, 144, 226, 0.1);
- border-radius: 8px;
- font-size: 13px;
- color: #4A90E2;
- margin-bottom: 16px;
- font-weight: 500;
- display: none;
- }
- .status.visible { display: block; }
- .status.success { background: rgba(76, 175, 80, 0.12); color: #2e7d32; }
+    .tip {
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #444;
+    }
 
- .error {
- padding: 12px;
- background: rgba(232, 102, 75, 0.1);
- border-radius: 8px;
- font-size: 13px;
- color: #E8664B;
- margin-bottom: 16px;
- display: none;
- text-align: left;
- }
- .error.visible { display: block; }
+    .tip:last-child { margin-bottom: 0; }
 
- .warning {
- padding: 12px;
- background: rgba(255, 165, 0, 0.12);
- border-radius: 8px;
- font-size: 13px;
- color: #b36200;
- margin-bottom: 16px;
- text-align: left;
- }
+    .tip strong {
+      color: #1a1a1a;
+      font-weight: 600;
+    }
 
- .instructions {
- padding: 20px;
- background: rgba(0, 0, 0, 0.02);
- border-radius: 8px;
- font-size: 13px;
- color: #666;
- line-height: 1.6;
- text-align: left;
- }
- .instructions strong { display: block; margin-bottom: 8px; color: #333; }
- .instructions ol { margin: 0; padding-left: 20px; }
- .instructions li { margin-bottom: 4px; }
+    .record-section { margin-bottom: 32px; }
 
- .footer { font-size: 12px; color: #999; margin-top: 32px; }
- </style>
+    .btn-record {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: none;
+      background: #E8664B;
+      color: white;
+      font-size: 48px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(232, 102, 75, 0.25);
+    }
+
+    .btn-record:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-record.recording {
+      width: 100px;
+      height: 100px;
+      box-shadow: 0 8px 24px rgba(232, 102, 75, 0.4), 0 0 0 12px rgba(232, 102, 75, 0.1);
+    }
+
+    .timer {
+      margin-top: 20px;
+      font-size: 28px;
+      font-weight: 600;
+      color: #E8664B;
+      font-variant-numeric: tabular-nums;
+      min-height: 36px;
+    }
+
+    .status {
+      padding: 12px;
+      background: rgba(74, 144, 226, 0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #4A90E2;
+      margin-bottom: 16px;
+      font-weight: 500;
+      display: none;
+    }
+    .status.visible { display: block; }
+    .status.success { background: rgba(76, 175, 80, 0.12); color: #2e7d32; }
+
+    .error {
+      padding: 12px;
+      background: rgba(232, 102, 75, 0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #E8664B;
+      margin-bottom: 16px;
+      display: none;
+      text-align: left;
+    }
+    .error.visible { display: block; }
+
+    .warning {
+      padding: 12px;
+      background: rgba(255, 165, 0, 0.12);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #b36200;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .instructions {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .instructions strong { display: block; margin-bottom: 8px; color: #333; }
+    .instructions ol { margin: 0; padding-left: 20px; }
+    .instructions li { margin-bottom: 4px; }
+
+    .footer { font-size: 12px; color: #999; margin-top: 32px; }
+  </style>
 </head>
 <body>
- <div class="container">
- <div class="header">
- <h1>Sara Registratore Vocale</h1>
- <p>Descrivi il momento mentre accade</p>
- <span class="educator-badge" id="educatorBadge"></span>
- </div>
+  <div class="container">
+    <div class="header">
+      <h1>Sara Registratore Vocale</h1>
+      <p>Descrivi il momento mentre accade</p>
+      <span class="educator-badge" id="educatorBadge"></span>
+    </div>
 
- <div class="record-section">
- <button class="btn-record" id="recordBtn" onclick="toggleRecording()">
- <span id="recordIcon">🎤</span>
- </button>
- <div class="timer" id="timer"></div>
- </div>
+    <div class="quick-tips">
+      <div class="quick-tips-title">Consigli rapidi</div>
+      <div class="tip"><strong>1. Parla in diretta</strong> mentre le cose accadono — come una radiocronaca.</div>
+      <div class="tip"><strong>2. Descrivi il contesto:</strong> dove sei (casa/centro), che ora è, cosa c'è attorno.</div>
+      <div class="tip"><strong>3. Descrivi cosa vedi:</strong> reazioni, suoni, movimenti di Sara.</div>
+      <div class="tip"><strong>4. Parla il minimo,</strong> lascia spazio ai vocalizzi di Sara — sono la parte più preziosa.</div>
+      <div class="tip"><strong>5. Anche pochi minuti</strong> sono utili — non aspettare la fine dell'attività.</div>
+    </div>
 
- <div id="status" class="status"></div>
- <div id="error" class="error"></div>
- <div id="warning" class="warning" style="display:none"></div>
+    <div class="record-section">
+      <button class="btn-record" id="recordBtn" onclick="toggleRecording()">
+        <span id="recordIcon">🎤</span>
+      </button>
+      <div class="timer" id="timer"></div>
+    </div>
 
- <div class="instructions">
- <strong>Come usare:</strong>
- <ol>
- <li>Premi il pulsante rosso per avviare</li>
- <li>Descrivi quello che stai facendo con Sara</li>
- <li>Premi il quadrato per finire</li>
- <li>Il file si salva da solo — nient'altro da fare</li>
- </ol>
- </div>
+    <div id="status" class="status"></div>
+    <div id="error" class="error"></div>
+    <div id="warning" class="warning" style="display:none"></div>
 
- <p class="footer">Versione 5.1 · Sara Recorder</p>
- </div>
+    <div class="instructions">
+      <strong>Come usare:</strong>
+      <ol>
+        <li>Premi il pulsante rosso per avviare</li>
+        <li>Descrivi quello che stai facendo con Sara</li>
+        <li>Premi il quadrato per finire</li>
+        <li>Il file si salva da solo — nient'altro da fare</li>
+      </ol>
+    </div>
 
- <script>
- // ============================================
- // CONFIGURAZIONE
- // ============================================
- const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygrMAaFAriearxpO1A248aueVhbD9mEeVwJXbDMJhuNAF63LGfRCgqAO-lAkaS-ij8/exec';
- const SHARED_SECRET = 'sara2026';
- // ============================================
+    <p class="footer">Versione 5.2 · Sara Recorder</p>
+  </div>
 
- // Legge l'ID educatore dall'URL (?id=mario)
- const urlParams = new URLSearchParams(window.location.search);
- const educatorId = urlParams.get('id') || '';
+  <script>
+    // ============================================
+    // CONFIGURAZIONE
+    // ============================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygrMAaFAriearxpO1A248aueVhbD9mEeVwJXbDMJhuNAF63LGfRCgqAO-lAkaS-ij8/exec';
+    const SHARED_SECRET = 'sara2026';
+    // ============================================
 
- // Mostra il badge con il nome educatore (se presente)
- const badge = document.getElementById('educatorBadge');
- if (educatorId) {
- badge.textContent = '👤 ' + educatorId;
- badge.style.display = 'inline-block';
- } else {
- badge.style.display = 'none';
- // Avvisa che manca l'ID
- const warn = document.getElementById('warning');
- warn.style.display = 'block';
- warn.textContent = '⚠️ Link senza ID educatore — il file verrà salvato senza nome. Usa il link personale che ti è stato inviato.';
- }
+    // Legge l'ID educatore dall'URL (?id=mario)
+    const urlParams = new URLSearchParams(window.location.search);
+    const educatorId = urlParams.get('id') || '';
 
- let isRecording = false;
- let mediaRecorder = null;
- let audioChunks = [];
- let recordingTime = 0;
- let timerInterval = null;
- let stream = null;
- let wakeLock = null;  // Screen Wake Lock
+    // Mostra il badge con il nome educatore (se presente)
+    const badge = document.getElementById('educatorBadge');
+    if (educatorId) {
+      badge.textContent = '👤 ' + educatorId;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+      // Avvisa che manca l'ID
+      const warn = document.getElementById('warning');
+      warn.style.display = 'block';
+      warn.textContent = '⚠️ Link senza ID educatore — il file verrà salvato senza nome. Usa il link personale che ti è stato inviato.';
+    }
 
- function toggleRecording() {
- if (isRecording) stopRecording();
- else startRecording();
- }
+    let isRecording = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordingTime = 0;
+    let timerInterval = null;
+    let stream = null;
+    let wakeLock = null; // Screen Wake Lock
 
- async function startRecording() {
- clearError();
- try {
- // Richiedi Screen Wake Lock per mantenere lo schermo acceso
- if ('wakeLock' in navigator) {
- try {
- wakeLock = await navigator.wakeLock.request('screen');
- console.log('Screen Wake Lock attivo');
- } catch (err) {
- console.warn('Screen Wake Lock non supportato o rifiutato:', err);
- }
- }
+    function toggleRecording() {
+      if (isRecording) stopRecording();
+      else startRecording();
+    }
 
- stream = await navigator.mediaDevices.getUserMedia({ audio: true });
- audioChunks = [];
+    async function startRecording() {
+      clearError();
+      try {
+        // Richiedi Screen Wake Lock per mantenere lo schermo acceso
+        if ('wakeLock' in navigator) {
+          try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Screen Wake Lock attivo');
+          } catch (err) {
+            console.warn('Screen Wake Lock non supportato o rifiutato:', err);
+          }
+        }
 
- const mimeType = MediaRecorder.isTypeSupported('audio/mp4')
- ? 'audio/mp4'
- : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
 
- mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        const mimeType = MediaRecorder.isTypeSupported('audio/mp4')
+          ? 'audio/mp4'
+          : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
 
- mediaRecorder.ondataavailable = (e) => {
- if (e.data.size > 0) audioChunks.push(e.data);
- };
- mediaRecorder.onstop = handleRecordingStop;
+        mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
 
- mediaRecorder.start();
- isRecording = true;
- recordingTime = 0;
- updateRecordButton();
- updateTimer();
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = handleRecordingStop;
 
- timerInterval = setInterval(() => {
- recordingTime++;
- updateTimer();
- }, 1000);
+        mediaRecorder.start();
+        isRecording = true;
+        recordingTime = 0;
+        updateRecordButton();
+        updateTimer();
 
- } catch (err) {
- showError('❌ Impossibile accedere al microfono. Controlla i permessi del browser.');
- console.error(err);
- releaseWakeLock();  // Rilascia il wake lock in caso di errore
- }
- }
+        timerInterval = setInterval(() => {
+          recordingTime++;
+          updateTimer();
+        }, 1000);
 
- function stopRecording() {
- if (mediaRecorder && isRecording) {
- mediaRecorder.stop();
- isRecording = false;
- clearInterval(timerInterval);
- updateRecordButton();
- if (stream) stream.getTracks().forEach(t => t.stop());
- releaseWakeLock();  // Rilascia il wake lock quando finisce la registrazione
- }
- }
+      } catch (err) {
+        showError('❌ Impossibile accedere al microfono. Controlla i permessi del browser.');
+        console.error(err);
+        releaseWakeLock(); // Rilascia il wake lock in caso di errore
+      }
+    }
 
- // Funzione per rilasciare il Screen Wake Lock
- async function releaseWakeLock() {
- if (wakeLock !== null) {
- try {
- await wakeLock.release();
- wakeLock = null;
- console.log('Screen Wake Lock rilasciato');
- } catch (err) {
- console.warn('Errore nel rilascio del Wake Lock:', err);
- }
- }
- }
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        clearInterval(timerInterval);
+        updateRecordButton();
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        releaseWakeLock(); // Rilascia il wake lock quando finisce la registrazione
+      }
+    }
 
- async function handleRecordingStop() {
- const mimeType = mediaRecorder.mimeType || 'audio/webm';
- const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
- const blob = new Blob(audioChunks, { type: mimeType });
+    // Funzione per rilasciare il Screen Wake Lock
+    async function releaseWakeLock() {
+      if (wakeLock !== null) {
+        try {
+          await wakeLock.release();
+          wakeLock = null;
+          console.log('Screen Wake Lock rilasciato');
+        } catch (err) {
+          console.warn('Errore nel rilascio del Wake Lock:', err);
+        }
+      }
+    }
 
- const now = new Date();
- const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
- const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    async function handleRecordingStop() {
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+      const blob = new Blob(audioChunks, { type: mimeType });
 
- // Nome file con ID educatore: Sara_20260715_143022_mario.webm
- const idSuffix = educatorId ? `_${educatorId}` : '';
- const fileName = `Sara_${dateStr}_${timeStr}${idSuffix}.${ext}`;
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+      const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
- document.getElementById('recordBtn').disabled = true;
- showStatus('Salvataggio in corso...');
+      // Nome file con ID educatore: Sara_20260715_143022_mario.webm
+      const idSuffix = educatorId ? `_${educatorId}` : '';
+      const fileName = `Sara_${dateStr}_${timeStr}${idSuffix}.${ext}`;
 
- try {
- const base64Data = await blobToBase64(blob);
- await sendToScript(base64Data, fileName, mimeType);
- showStatus(`✅ Salvato: ${fileName}`, true);
- } catch (err) {
- console.error(err);
- showError('Salvataggio non riuscito. Controlla la connessione internet e riprova.');
- } finally {
- document.getElementById('recordBtn').disabled = false;
- recordingTime = 0;
- updateTimer();
- setTimeout(clearStatus, 4000);
- }
- }
+      document.getElementById('recordBtn').disabled = true;
+      showStatus('Salvataggio in corso...');
 
- function blobToBase64(blob) {
- return new Promise((resolve, reject) => {
- const reader = new FileReader();
- reader.onloadend = () => {
- const base64 = reader.result.split(',')[1];
- resolve(base64);
- };
- reader.onerror = reject;
- reader.readAsDataURL(blob);
- });
- }
+      try {
+        const base64Data = await blobToBase64(blob);
+        await sendToScript(base64Data, fileName, mimeType);
+        showStatus(`✅ Salvato: ${fileName}`, true);
+      } catch (err) {
+        console.error(err);
+        showError('Salvataggio non riuscito. Controlla la connessione internet e riprova.');
+      } finally {
+        document.getElementById('recordBtn').disabled = false;
+        recordingTime = 0;
+        updateTimer();
+        setTimeout(clearStatus, 4000);
+      }
+    }
 
- async function sendToScript(base64Data, fileName, mimeType) {
- const payload = {
- secret: SHARED_SECRET,
- fileName: fileName,
- mimeType: mimeType,
- fileData: base64Data
- };
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
 
- const response = await fetch(SCRIPT_URL, {
- method: 'POST',
- headers: { 'Content-Type': 'text/plain;charset=utf-8' },
- body: JSON.stringify(payload)
- });
+    async function sendToScript(base64Data, fileName, mimeType) {
+      const payload = {
+        secret: SHARED_SECRET,
+        fileName: fileName,
+        mimeType: mimeType,
+        fileData: base64Data
+      };
 
- const result = await response.json();
- if (!result.success) {
- throw new Error(result.error || 'Errore sconosciuto');
- }
- return result;
- }
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
 
- function updateRecordButton() {
- const btn = document.getElementById('recordBtn');
- const icon = document.getElementById('recordIcon');
- if (isRecording) {
- btn.classList.add('recording');
- icon.textContent = '⏹️';
- } else {
- btn.classList.remove('recording');
- icon.textContent = '🎤';
- }
- }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Errore sconosciuto');
+      }
+      return result;
+    }
 
- function updateTimer() {
- const el = document.getElementById('timer');
- el.textContent = (isRecording || recordingTime > 0) ? formatDuration(recordingTime) : '';
- }
+    function updateRecordButton() {
+      const btn = document.getElementById('recordBtn');
+      const icon = document.getElementById('recordIcon');
+      if (isRecording) {
+        btn.classList.add('recording');
+        icon.textContent = '⏹️';
+      } else {
+        btn.classList.remove('recording');
+        icon.textContent = '🎤';
+      }
+    }
 
- function formatDuration(seconds) {
- const m = Math.floor(seconds / 60);
- const s = seconds % 60;
- return `${m}:${pad(s)}`;
- }
+    function updateTimer() {
+      const el = document.getElementById('timer');
+      el.textContent = (isRecording || recordingTime > 0) ? formatDuration(recordingTime) : '';
+    }
 
- function pad(n) { return String(n).padStart(2, '0'); }
+    function formatDuration(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${pad(s)}`;
+    }
 
- function showStatus(msg, success) {
- const el = document.getElementById('status');
- el.textContent = msg;
- el.classList.add('visible');
- el.classList.toggle('success', !!success);
- }
- function clearStatus() {
- document.getElementById('status').classList.remove('visible', 'success');
- }
- function showError(msg) {
- const el = document.getElementById('error');
- el.textContent = msg;
- el.classList.add('visible');
- }
- function clearError() {
- document.getElementById('error').classList.remove('visible');
- }
- </script>
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function showStatus(msg, success) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.classList.add('visible');
+      el.classList.toggle('success', !!success);
+    }
+    function clearStatus() {
+      document.getElementById('status').classList.remove('visible', 'success');
+    }
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+    function clearError() {
+      document.getElementById('error').classList.remove('visible');
+    }
+  </script>
 </body>
 </html>
