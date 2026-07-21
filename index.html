@@ -1,141 +1,289 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="theme-color" content="#E8664B">
- <title>Sara Registratore Vocale</title>
-
- <style>
- * { margin: 0; padding: 0; box-sizing: border-box; }
-
- body {
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
- background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%);
- min-height: 100vh;
- display: flex;
- align-items: center;
- justify-content: center;
- padding: 20px;
- }
-
- .container { max-width: 400px; width: 100%; text-align: center; }
-
- .header { margin-bottom: 40px; }
- .header h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
- .header p { font-size: 14px; color: #666; }
- .header .educator-badge {
- display: inline-block;
- margin-top: 10px;
- padding: 4px 12px;
- background: rgba(232, 102, 75, 0.1);
- border-radius: 20px;
- font-size: 13px;
- color: #E8664B;
- font-weight: 500;
- }
-
- .tips {
- margin-bottom: 32px;
- padding: 16px;
- background: rgba(232, 102, 75, 0.08);
- border-left: 4px solid #E8664B;
- border-radius: 6px;
- text-align: left;
- font-size: 13px;
- color: #333;
- line-height: 1.6;
- }
- .tips strong { display: block; margin-bottom: 10px; color: #E8664B; font-weight: 600; }
- .tips ol { margin: 0; padding-left: 20px; }
- .tips li { margin-bottom: 6px; }
-
- .record-section { margin-bottom: 32px; }
-
- .btn-record {
- width: 160px;
- height: 160px;
- border-radius: 50%;
- border: none;
- background: #E8664B;
- color: white;
- font-size: 56px;
- cursor: pointer;
- display: flex;
- align-items: center;
- justify-content: center;
- margin: 0 auto;
- transition: all 0.3s;
- box-shadow: 0 4px 16px rgba(232, 102, 75, 0.25);
- }
- .btn-record:disabled { opacity: 0.4; cursor: not-allowed; }
- .btn-record.recording {
- width: 140px; height: 140px;
- box-shadow: 0 8px 24px rgba(232, 102, 75, 0.4), 0 0 0 12px rgba(232, 102, 75, 0.1);
- }
-
- .timer {
- margin-top: 24px;
- font-size: 32px;
- font-weight: 600;
- color: #E8664B;
- font-variant-numeric: tabular-nums;
- min-height: 40px;
- }
-
- .status {
- padding: 12px;
- background: rgba(74, 144, 226, 0.1);
- border-radius: 8px;
- font-size: 13px;
- color: #4A90E2;
- margin-bottom: 16px;
- font-weight: 500;
- display: none;
- }
- .status.visible { display: block; }
- .status.success { background: rgba(76, 175, 80, 0.12); color: #2e7d32; }
- .status.warning { background: rgba(255, 165, 0, 0.12); color: #b36200; }
-
- .error {
- padding: 12px;
- background: rgba(232, 102, 75, 0.1);
- border-radius: 8px;
- font-size: 13px;
- color: #E8664B;
- margin-bottom: 16px;
- display: none;
- text-align: left;
- }
- .error.visible { display: block; }
-
- .retry-btn {
- margin-top: 8px;
- padding: 8px 16px;
- background: #E8664B;
- color: white;
- border: none;
- border-radius: 6px;
- font-size: 13px;
- cursor: pointer;
- font-weight: 500;
- }
- .retry-btn:hover { background: #d45536; }
-
- .warning {
- padding: 12px;
- background: rgba(255, 165, 0, 0.12);
- border-radius: 8px;
- font-size: 13px;
- color: #b36200;
- margin-bottom: 16px;
- text-align: left;
- }
-
- .footer { font-size: 12px; color: #999; margin-top: 32px; }
- </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#E8664B">
+<title>Sara Registratore Vocale</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.container { max-width: 400px; width: 100%; text-align: center; }
+.header { margin-bottom: 40px; }
+.header h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+.header p { font-size: 14px; color: #666; }
+.header .educator-badge { display: inline-block; margin-top: 10px; padding: 4px 12px; background: rgba(232, 102, 75, 0.1); border-radius: 20px; font-size: 13px; color: #E8664B; font-weight: 500; }
+.tips { margin-bottom: 32px; padding: 16px; background: rgba(232, 102, 75, 0.08); border-left: 4px solid #E8664B; border-radius: 6px; text-align: left; font-size: 13px; color: #333; line-height: 1.6; }
+.tips strong { display: block; margin-bottom: 10px; color: #E8664B; font-weight: 600; }
+.tips ol { margin: 0; padding-left: 20px; }
+.tips li { margin-bottom: 6px; }
+.record-section { margin-bottom: 32px; }
+.btn-record { width: 160px; height: 160px; border-radius: 50%; border: none; background: #E8664B; color: white; font-size: 56px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: all 0.3s; box-shadow: 0 4px 16px rgba(232, 102, 75, 0.25); }
+.btn-record:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-record.recording { width: 140px; height: 140px; box-shadow: 0 8px 24px rgba(232, 102, 75, 0.4), 0 0 0 12px rgba(232, 102, 75, 0.1); }
+.timer { margin-top: 24px; font-size: 32px; font-weight: 600; color: #E8664B; font-variant-numeric: tabular-nums; min-height: 40px; }
+.status { padding: 12px; background: rgba(74, 144, 226, 0.1); border-radius: 8px; font-size: 13px; color: #4A90E2; margin-bottom: 16px; font-weight: 500; display: none; }
+.status.visible { display: block; }
+.status.success { background: rgba(76, 175, 80, 0.12); color: #2e7d32; }
+.status.warning { background: rgba(255, 165, 0, 0.12); color: #b36200; }
+.error { padding: 12px; background: rgba(232, 102, 75, 0.1); border-radius: 8px; font-size: 13px; color: #E8664B; margin-bottom: 16px; display: none; text-align: left; }
+.error.visible { display: block; }
+.retry-btn { margin-top: 8px; padding: 8px 16px; background: #E8664B; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.retry-btn:hover { background: #d45536; }
+.warning { padding: 12px; background: rgba(255, 165, 0, 0.12); border-radius: 8px; font-size: 13px; color: #b36200; margin-bottom: 16px; text-align: left; }
+.footer { font-size: 12px; color: #999; margin-top: 32px; }
+</style>
 </head>
 <body>
- <div class="container">
- <div class="header">
- <h1>Sara Registratore
+<div class="container">
+<div class="header">
+<h1>Sara Registratore Vocale</h1>
+<p>Descrivi il momento mentre accade</p>
+<span class="educator-badge" id="educatorBadge"></span>
+</div>
+<div class="tips">
+<strong>💡 CONSIGLI RAPIDI</strong>
+<ol>
+<li><strong>Parla in diretta</strong> mentre le cose accadono — come una radiocronaca.</li>
+<li><strong>Descrivi il contesto:</strong> dove sei (casa/centro), che ora è, cosa c'è attorno.</li>
+<li><strong>Descrivi cosa vedi:</strong> reazioni, suoni, movimenti di Sara.</li>
+<li><strong>Parla il minimo,</strong> lascia spazio ai vocalizzi di Sara — sono la parte più preziosa.</li>
+<li><strong>Anche pochi minuti sono utili</strong> — non aspettare la fine dell'attività.</li>
+</ol>
+</div>
+<div class="record-section">
+<button class="btn-record" id="recordBtn" onclick="toggleRecording()">
+<span id="recordIcon">🎤</span>
+</button>
+<div class="timer" id="timer"></div>
+</div>
+<div id="status" class="status"></div>
+<div id="error" class="error"></div>
+<div id="warning" class="warning" style="display:none"></div>
+<p class="footer">Versione 5.2 · Sara Recorder</p>
+</div>
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygrMAaFAriearxpO1A248aueVhbD9mEeVwJXbDMJhuNAF63LGfRCgqAO-lAkaS-ij8/exec';
+const SHARED_SECRET = 'sara2026';
+const MAX_RETRIES = 4;
+const urlParams = new URLSearchParams(window.location.search);
+const educatorId = urlParams.get('id') || '';
+const badge = document.getElementById('educatorBadge');
+if (educatorId) {
+badge.textContent = '👤 ' + educatorId;
+badge.style.display = 'inline-block';
+} else {
+badge.style.display = 'none';
+const warn = document.getElementById('warning');
+warn.style.display = 'block';
+warn.textContent = '⚠️ Link senza ID educatore — il file verrà salvato senza nome. Usa il link personale che ti è stato inviato.';
+}
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingTime = 0;
+let timerInterval = null;
+let stream = null;
+let wakeLock = null;
+let lastBlob = null;
+let lastFileName = null;
+let lastMimeType = null;
+function toggleRecording() {
+if (isRecording) stopRecording();
+else startRecording();
+}
+async function startRecording() {
+clearError();
+try {
+if ('wakeLock' in navigator) {
+try {
+wakeLock = await navigator.wakeLock.request('screen');
+} catch (err) {
+console.warn('Screen Wake Lock non supportato:', err);
+}
+}
+stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+audioChunks = [];
+const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+mediaRecorder.ondataavailable = (e) => {
+if (e.data.size > 0) audioChunks.push(e.data);
+};
+mediaRecorder.onstop = handleRecordingStop;
+mediaRecorder.start();
+isRecording = true;
+recordingTime = 0;
+updateRecordButton();
+updateTimer();
+timerInterval = setInterval(() => {
+recordingTime++;
+updateTimer();
+}, 1000);
+} catch (err) {
+showError('❌ Impossibile accedere al microfono. Controlla i permessi del browser.');
+console.error(err);
+releaseWakeLock();
+}
+}
+function stopRecording() {
+if (mediaRecorder && isRecording) {
+mediaRecorder.stop();
+isRecording = false;
+clearInterval(timerInterval);
+updateRecordButton();
+if (stream) stream.getTracks().forEach(t => t.stop());
+releaseWakeLock();
+}
+}
+async function releaseWakeLock() {
+if (wakeLock !== null) {
+try {
+await wakeLock.release();
+wakeLock = null;
+} catch (err) {
+console.warn('Errore nel rilascio del Wake Lock:', err);
+}
+}
+}
+async function handleRecordingStop() {
+const mimeType = mediaRecorder.mimeType || 'audio/webm';
+const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+const blob = new Blob(audioChunks, { type: mimeType });
+const now = new Date();
+const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+const idSuffix = educatorId ? `_${educatorId}` : '';
+const fileName = `Sara_${dateStr}_${timeStr}${idSuffix}.${ext}`;
+lastBlob = blob;
+lastFileName = fileName;
+lastMimeType = mimeType;
+await attemptUpload(blob, fileName, mimeType);
+}
+async function attemptUpload(blob, fileName, mimeType) {
+document.getElementById('recordBtn').disabled = true;
+clearError();
+showStatus('Preparazione upload...');
+try {
+const base64Data = await blobToBase64(blob);
+await uploadWithRetry(base64Data, fileName, mimeType);
+showStatus(`✅ Salvato: ${fileName}`, 'success');
+setTimeout(clearStatus, 5000);
+} catch (err) {
+console.error(err);
+showError(`❌ Salvataggio non riuscito dopo ${MAX_RETRIES} tentativi.<br>Il file resta pronto: puoi riprovare qui sotto.<br><button class="retry-btn" onclick="manualRetry()">Riprova ora</button>`);
+showStatus('⏳ In attesa — non chiudere la pagina se possibile', 'warning');
+} finally {
+document.getElementById('recordBtn').disabled = false;
+recordingTime = 0;
+updateTimer();
+}
+}
+async function manualRetry() {
+if (!lastBlob) return;
+await attemptUpload(lastBlob, lastFileName, lastMimeType);
+}
+async function uploadWithRetry(base64Data, fileName, mimeType) {
+let attempt = 0;
+let lastErr = null;
+while (attempt < MAX_RETRIES) {
+attempt++;
+try {
+if (attempt > 1) {
+showStatus(`Tentativo ${attempt}/${MAX_RETRIES}...`);
+}
+await sendToScript(base64Data, fileName, mimeType);
+return;
+} catch (err) {
+lastErr = err;
+console.warn(`Tentativo ${attempt} fallito:`, err);
+if (attempt < MAX_RETRIES) {
+const backoff = Math.min(3000 * attempt, 15000);
+await wait(backoff);
+}
+}
+}
+throw lastErr;
+}
+function wait(ms) {
+return new Promise(resolve => setTimeout(resolve, ms));
+}
+function blobToBase64(blob) {
+return new Promise((resolve, reject) => {
+const reader = new FileReader();
+reader.onloadend = () => {
+const base64 = reader.result.split(',')[1];
+resolve(base64);
+};
+reader.onerror = reject;
+reader.readAsDataURL(blob);
+});
+}
+async function sendToScript(base64Data, fileName, mimeType) {
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 180000);
+try {
+const payload = { secret: SHARED_SECRET, fileName: fileName, mimeType: mimeType, fileData: base64Data };
+const response = await fetch(SCRIPT_URL, {
+method: 'POST',
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: JSON.stringify(payload),
+signal: controller.signal
+});
+clearTimeout(timeoutId);
+const result = await response.json();
+if (!result.success) {
+throw new Error(result.error || 'Errore sconosciuto');
+}
+return result;
+} catch (err) {
+clearTimeout(timeoutId);
+if (err.name === 'AbortError') {
+throw new Error('Timeout: upload troppo lento');
+}
+throw err;
+}
+}
+function updateRecordButton() {
+const btn = document.getElementById('recordBtn');
+const icon = document.getElementById('recordIcon');
+if (isRecording) {
+btn.classList.add('recording');
+icon.textContent = '⏹️';
+} else {
+btn.classList.remove('recording');
+icon.textContent = '🎤';
+}
+}
+function updateTimer() {
+const el = document.getElementById('timer');
+el.textContent = (isRecording || recordingTime > 0) ? formatDuration(recordingTime) : '';
+}
+function formatDuration(seconds) {
+const m = Math.floor(seconds / 60);
+const s = seconds % 60;
+return `${m}:${pad(s)}`;
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+function showStatus(msg, type) {
+const el = document.getElementById('status');
+el.textContent = msg;
+el.classList.add('visible');
+el.classList.remove('success', 'warning');
+if (type === 'success') el.classList.add('success');
+if (type === 'warning') el.classList.add('warning');
+}
+function clearStatus() {
+document.getElementById('status').classList.remove('visible', 'success', 'warning');
+}
+function showError(msg) {
+const el = document.getElementById('error');
+el.innerHTML = msg;
+el.classList.add('visible');
+}
+function clearError() {
+document.getElementById('error').classList.remove('visible');
+document.getElementById('error').innerHTML = '';
+}
+</script>
+</body>
+</html>
