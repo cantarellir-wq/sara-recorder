@@ -2,306 +2,293 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#E8664B">
-<title>Sara Registratore Vocale</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sara Recorder</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #fafaf8 0%, #f5f1ed 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.container { max-width: 400px; width: 100%; text-align: center; }
-.header { margin-bottom: 40px; }
-.header h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-.header p { font-size: 14px; color: #666; }
-.header .educator-badge { display: inline-block; margin-top: 10px; padding: 4px 12px; background: rgba(232, 102, 75, 0.1); border-radius: 20px; font-size: 13px; color: #E8664B; font-weight: 500; }
-.tips { margin-bottom: 32px; padding: 16px; background: rgba(232, 102, 75, 0.08); border-left: 4px solid #E8664B; border-radius: 6px; text-align: left; font-size: 13px; color: #333; line-height: 1.6; }
-.tips strong { display: block; margin-bottom: 10px; color: #E8664B; font-weight: 600; }
-.tips ol { margin: 0; padding-left: 20px; }
-.tips li { margin-bottom: 6px; }
-.record-section { margin-bottom: 32px; }
-.btn-record { width: 160px; height: 160px; border-radius: 50%; border: none; background: #E8664B; color: white; font-size: 56px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: all 0.3s; box-shadow: 0 4px 16px rgba(232, 102, 75, 0.25); }
-.btn-record:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-record.recording { width: 140px; height: 140px; box-shadow: 0 8px 24px rgba(232, 102, 75, 0.4), 0 0 0 12px rgba(232, 102, 75, 0.1); }
-.timer { margin-top: 24px; font-size: 32px; font-weight: 600; color: #E8664B; font-variant-numeric: tabular-nums; min-height: 40px; }
-.status { padding: 12px; background: rgba(74, 144, 226, 0.1); border-radius: 8px; font-size: 13px; color: #4A90E2; margin-bottom: 16px; font-weight: 500; display: none; }
-.status.visible { display: block; }
-.status.success { background: rgba(76, 175, 80, 0.12); color: #2e7d32; }
-.status.warning { background: rgba(255, 165, 0, 0.12); color: #b36200; }
-.error { padding: 12px; background: rgba(232, 102, 75, 0.1); border-radius: 8px; font-size: 13px; color: #E8664B; margin-bottom: 16px; display: none; text-align: left; }
-.error.visible { display: block; }
-.retry-btn { margin-top: 8px; padding: 8px 16px; background: #E8664B; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500; }
-.retry-btn:hover { background: #d45536; }
-.warning { padding: 12px; background: rgba(255, 165, 0, 0.12); border-radius: 8px; font-size: 13px; color: #b36200; margin-bottom: 16px; text-align: left; }
-.footer { font-size: 12px; color: #999; margin-top: 32px; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f8; color: #1a2634; display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh; padding: 24px 16px;
+  }
+  h1 { font-size: 20px; margin: 8px 0 2px; }
+  .id-chip {
+    font-size: 14px; color: #556; background: #e4e9ee; padding: 4px 12px;
+    border-radius: 20px; margin-bottom: 28px;
+  }
+  .id-chip.missing { background: #ffe0e0; color: #a00; }
+  .rec-btn {
+    width: 180px; height: 180px; border-radius: 50%; border: none;
+    background: #2e7d32; color: #fff; font-size: 20px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.15);
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    transition: background .2s, transform .1s; user-select: none;
+  }
+  .rec-btn:active { transform: scale(.97); }
+  .rec-btn.recording { background: #c62828; }
+  .rec-btn:disabled { background: #b0bac3; cursor: default; }
+  .timer { font-size: 40px; font-variant-numeric: tabular-nums; margin: 24px 0 6px; letter-spacing: 1px; }
+  .status { font-size: 15px; color: #445; min-height: 22px; text-align: center; }
+  .status .warn { color: #c47f00; }
+  .status .ok { color: #2e7d32; font-weight: 600; }
+  .tips { margin-top: 34px; font-size: 13px; color: #78838d; max-width: 320px; text-align: center; line-height: 1.5; }
+  .err { color: #c62828; margin-top: 20px; text-align: center; max-width: 320px; }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1>Sara Registratore Vocale</h1>
-<p>Descrivi il momento mentre accade</p>
-<span class="educator-badge" id="educatorBadge"></span>
-</div>
-<div class="tips">
-<strong>💡 CONSIGLI RAPIDI</strong>
-<ol>
-<li><strong>Parla in diretta</strong> mentre le cose accadono — come una radiocronaca.</li>
-<li><strong>Descrivi il contesto:</strong> dove sei (casa/centro), che ora è, cosa c'è attorno.</li>
-<li><strong>Descrivi cosa vedi:</strong> reazioni, suoni, movimenti di Sara.</li>
-<li><strong>Parla il minimo,</strong> lascia spazio ai vocalizzi di Sara — sono la parte più preziosa.</li>
-<li><strong>Anche pochi minuti sono utili</strong> — non aspettare la fine dell'attività.</li>
-</ol>
-</div>
-<div class="record-section">
-<button class="btn-record" id="recordBtn" onclick="toggleRecording()">
-<span id="recordIcon">🎤</span>
-</button>
-<div class="timer" id="timer"></div>
-</div>
-<div id="status" class="status"></div>
-<div id="error" class="error"></div>
-<div id="warning" class="warning" style="display:none"></div>
-<p class="footer">Versione 5.3 · Sara Recorder</p>
-</div>
+  <h1>Sara Recorder</h1>
+  <div id="idChip" class="id-chip">educatore: —</div>
+
+  <button id="recBtn" class="rec-btn">Avvia<br>registrazione</button>
+
+  <div class="timer" id="timer">00:00</div>
+  <div class="status" id="status"></div>
+
+  <div class="tips">
+    Parla in diretta descrivendo quello che fai con Sara.<br>
+    Tieni l'app aperta durante la registrazione.
+  </div>
+  <div class="err" id="err"></div>
+
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAVAacfv98qSQytj66RceqrePBnEuCXTC2e_YGDvM-Facg7S9cDkPPD5F4a0g0koAQ/exec';
-const SHARED_SECRET = 'sara2026';
-const FOLDER_ID = '1HoFv2oRRn43evk5Cf8cvmCnyjoBeA3NI';
-const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB per chunk
-const urlParams = new URLSearchParams(window.location.search);
-const educatorId = urlParams.get('id') || '';
-const badge = document.getElementById('educatorBadge');
-if (educatorId) {
-badge.textContent = '👤 ' + educatorId;
-badge.style.display = 'inline-block';
+// ===================== CONFIGURAZIONE =====================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAVAacfv98qSQytj66RceqrePBnEuCXTC2e_YGDvM-Facg7S9cDkPPD5F4a0g0koAQ/exec';
+const SHARED_SECRET   = 'sara2026';
+const SEGMENT_MS      = 3 * 60 * 1000;   // durata di ogni pezzo: 3 minuti
+// =========================================================
+
+// --- Identità educatore dall'URL (?id=nome) ---
+const params = new URLSearchParams(location.search);
+const rawId = params.get('id') || '';
+const eduId = rawId.replace(/[^A-Za-z0-9_-]/g, '');
+
+const recBtn = document.getElementById('recBtn');
+const timerEl = document.getElementById('timer');
+const statusEl = document.getElementById('status');
+const errEl = document.getElementById('err');
+const idChip = document.getElementById('idChip');
+
+if (eduId) {
+  idChip.textContent = 'educatore: ' + eduId;
 } else {
-badge.style.display = 'none';
-const warn = document.getElementById('warning');
-warn.style.display = 'block';
-warn.textContent = '⚠️ Link senza ID educatore — il file verrà salvato senza nome. Usa il link personale che ti è stato inviato.';
+  idChip.textContent = 'educatore mancante nel link!';
+  idChip.classList.add('missing');
+  recBtn.disabled = true;
+  errEl.textContent = 'Il link non contiene ?id=nome. Chiedi a Mary il link corretto.';
 }
-let isRecording = false;
-let mediaRecorder = null;
-let audioChunks = [];
-let recordingTime = 0;
-let timerInterval = null;
+
+// --- Stato sessione ---
 let stream = null;
+let sessionMime = '';
+let sessionExt = 'webm';
+let sessionPrefix = '';
+let partNum = 0;
+let recording = false;
+let currentRecorder = null;
+let currentChunks = [];
+let rotateTimer = null;
+let sessionStart = 0;
+let clockTimer = null;
 let wakeLock = null;
-let lastBlob = null;
-let lastFileName = null;
-let lastMimeType = null;
-function toggleRecording() {
-if (isRecording) stopRecording();
-else startRecording();
-}
-async function startRecording() {
-clearError();
-try {
-if ('wakeLock' in navigator) {
-try {
-wakeLock = await navigator.wakeLock.request('screen');
-} catch (err) {
-console.warn('Screen Wake Lock non supportato:', err);
-}
-}
-stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-audioChunks = [];
-const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
-mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-mediaRecorder.ondataavailable = (e) => {
-if (e.data.size > 0) audioChunks.push(e.data);
-};
-mediaRecorder.onstop = handleRecordingStop;
-mediaRecorder.start();
-isRecording = true;
-recordingTime = 0;
-updateRecordButton();
-updateTimer();
-timerInterval = setInterval(() => {
-recordingTime++;
-updateTimer();
-}, 1000);
-} catch (err) {
-showError('❌ Impossibile accedere al microfono. Controlla i permessi del browser.');
-console.error(err);
-releaseWakeLock();
-}
-}
-function stopRecording() {
-if (mediaRecorder && isRecording) {
-mediaRecorder.stop();
-isRecording = false;
-clearInterval(timerInterval);
-updateRecordButton();
-if (stream) stream.getTracks().forEach(t => t.stop());
-}
-}
-async function releaseWakeLock() {
-if (wakeLock !== null) {
-try {
-await wakeLock.release();
-wakeLock = null;
-} catch (err) {
-console.warn('Errore nel rilascio del Wake Lock:', err);
-}
-}
-}
-async function handleRecordingStop() {
-const mimeType = mediaRecorder.mimeType || 'audio/webm';
-const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
-const blob = new Blob(audioChunks, { type: mimeType });
-const now = new Date();
-const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-const idSuffix = educatorId ? `_${educatorId}` : '';
-const fileName = `Sara_${dateStr}_${timeStr}${idSuffix}.${ext}`;
-lastBlob = blob;
-lastFileName = fileName;
-lastMimeType = mimeType;
-// Mantieni Wake Lock attivo durante l'upload
-if ('wakeLock' in navigator && !wakeLock) {
-try {
-wakeLock = await navigator.wakeLock.request('screen');
-} catch (err) {
-console.warn('Screen Wake Lock non disponibile durante upload:', err);
-}
-}
-await attemptResumableUpload(blob, fileName, mimeType);
-}
-async function attemptResumableUpload(blob, fileName, mimeType) {
-document.getElementById('recordBtn').disabled = true;
-clearError();
-showStatus('Preparazione upload...');
-try {
-// Step 1: Ottieni token
-showStatus('Richiesta autorizzazione...');
-const tokenResp = await fetch(SCRIPT_URL + '?action=mint-token&secret=' + encodeURIComponent(SHARED_SECRET));
-const tokenData = await tokenResp.json();
-if (!tokenData.success) {
-throw new Error('Impossibile ottenere token: ' + (tokenData.error || 'errore sconosciuto'));
-}
-const token = tokenData.token;
-// Step 2: Resumable upload
-showStatus('Caricamento in corso...');
-await resumableUploadToDrive(blob, fileName, mimeType, token);
-showStatus(`✅ Salvato: ${fileName}`, 'success');
-setTimeout(clearStatus, 5000);
-} catch (err) {
-console.error(err);
-showError(`❌ Salvataggio non riuscito.<br>${err.message}<br><button class="retry-btn" onclick="manualRetry()">Riprova ora</button>`);
-} finally {
-await releaseWakeLock();
-document.getElementById('recordBtn').disabled = false;
-recordingTime = 0;
-updateTimer();
-}
-}
-async function resumableUploadToDrive(blob, fileName, mimeType, token) {
-const fileSize = blob.size;
-let uploadedBytes = 0;
-// Step 1: Inizia sessione resumable
-const sessionResp = await fetch(
-'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
-{
-method: 'POST',
-headers: {
-'Authorization': `Bearer ${token}`,
-'X-Goog-Upload-Protocol': 'resumable',
-'X-Goog-Upload-Header-Content-Length': fileSize,
-'X-Goog-Upload-Header-Content-Type': mimeType,
-'Content-Type': 'application/json'
-},
-body: JSON.stringify({
-name: fileName,
-mimeType: mimeType,
-parents: [FOLDER_ID]
-})
-}
-);
-if (!sessionResp.ok) {
-throw new Error(`Sessione upload fallita: ${sessionResp.status}`);
-}
-const sessionUri = sessionResp.headers.get('location');
-if (!sessionUri) {
-throw new Error('Nessun URI di sessione ricevuto');
-}
-// Step 2: Upload in chunk
-while (uploadedBytes < fileSize) {
-const chunkStart = uploadedBytes;
-const chunkEnd = Math.min(uploadedBytes + CHUNK_SIZE, fileSize);
-const chunk = blob.slice(chunkStart, chunkEnd);
-const chunkResp = await fetch(sessionUri, {
-method: 'PUT',
-headers: {
-'Content-Type': mimeType,
-'Content-Length': chunkEnd - chunkStart,
-'Content-Range': `bytes ${chunkStart}-${chunkEnd - 1}/${fileSize}`
-},
-body: chunk
+
+// --- Coda di upload (si svuota da sola in sottofondo) ---
+let uploadQueue = [];   // {blob, fileName, attempts, status}
+let savedCount = 0;
+let processing = false;
+
+// ===================== AVVIO / STOP =====================
+recBtn.addEventListener('click', () => {
+  if (!recording) startSession();
+  else stopSession();
 });
-if (chunkResp.status === 200 || chunkResp.status === 201) {
-// Upload completato
-uploadedBytes = fileSize;
-showStatus(`✅ Upload completato: ${fileName}`, 'success');
-} else if (chunkResp.status === 308) {
-// Continua upload
-const range = chunkResp.headers.get('range');
-if (range) {
-uploadedBytes = parseInt(range.split('-')[1]) + 1;
-} else {
-uploadedBytes = chunkEnd;
+
+async function startSession() {
+  errEl.textContent = '';
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    errEl.textContent = 'Impossibile accedere al microfono. Controlla i permessi del browser.';
+    return;
+  }
+
+  sessionMime = pickMime(stream);
+  sessionExt = extFor(sessionMime);
+  sessionPrefix = 'Sara_' + timestamp() + '_' + eduId;
+  partNum = 0;
+  savedCount = 0;
+  uploadQueue = [];
+  recording = true;
+  sessionStart = Date.now();
+
+  recBtn.textContent = 'Stop';
+  recBtn.classList.add('recording');
+  clockTimer = setInterval(updateClock, 500);
+  requestWakeLock();
+  startSegment();
+  updateStatus();
 }
-const percent = Math.round((uploadedBytes / fileSize) * 100);
-showStatus(`Caricamento: ${percent}%...`);
-} else {
-throw new Error(`Upload chunk fallito: ${chunkResp.status}`);
+
+function stopSession() {
+  recording = false;
+  clearTimeout(rotateTimer);
+  clearInterval(clockTimer);
+  if (currentRecorder && currentRecorder.state === 'recording') {
+    currentRecorder.stop();   // l'ultimo pezzo (anche corto) finisce in coda
+  }
+  releaseWakeLock();
+  recBtn.textContent = 'Avvia\nregistrazione';
+  recBtn.classList.remove('recording');
+  recBtn.style.whiteSpace = 'pre-line';
+  updateStatus();
 }
+
+// ===================== SEGMENTAZIONE =====================
+function startSegment() {
+  partNum++;
+  const thisPart = partNum;
+  currentChunks = [];
+  currentRecorder = new MediaRecorder(stream, sessionMime ? { mimeType: sessionMime } : {});
+
+  currentRecorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) currentChunks.push(e.data);
+  };
+  currentRecorder.onstop = () => {
+    const chunks = currentChunks;
+    // riparto SUBITO col pezzo successivo (se ancora in registrazione) per ridurre il buco
+    if (recording) startSegment();
+    // poi metto in coda il pezzo appena chiuso
+    if (chunks.length) {
+      const blob = new Blob(chunks, { type: sessionMime });
+      enqueue(blob, thisPart);
+    }
+  };
+
+  currentRecorder.start();   // niente timeslice: un solo blob per pezzo, pulito
+  rotateTimer = setTimeout(() => {
+    if (currentRecorder && currentRecorder.state === 'recording') currentRecorder.stop();
+  }, SEGMENT_MS);
 }
+
+// ===================== CODA DI UPLOAD =====================
+function enqueue(blob, part) {
+  const fileName = sessionPrefix + '_part' + String(part).padStart(2, '0') + '.' + sessionExt;
+  uploadQueue.push({ blob, fileName, attempts: 0, status: 'pending' });
+  updateStatus();
+  processQueue();
 }
-async function manualRetry() {
-if (!lastBlob) return;
-await attemptResumableUpload(lastBlob, lastFileName, lastMimeType);
+
+async function processQueue() {
+  if (processing) return;
+  processing = true;
+  try {
+    while (true) {
+      const item = uploadQueue.find(i => i.status === 'pending' || i.status === 'retry');
+      if (!item) break;
+      item.status = 'uploading';
+      updateStatus();
+      try {
+        const b64 = await blobToBase64(item.blob);
+        await uploadOne(item.fileName, sessionMime, b64);
+        // salvato: lo tolgo dalla coda e libero memoria
+        const idx = uploadQueue.indexOf(item);
+        if (idx > -1) uploadQueue.splice(idx, 1);
+        item.blob = null;
+        savedCount++;
+        updateStatus();
+      } catch (err) {
+        item.attempts++;
+        item.status = 'retry';
+        // sposto in fondo così anche gli altri pezzi hanno il loro turno
+        const idx = uploadQueue.indexOf(item);
+        if (idx > -1) { uploadQueue.splice(idx, 1); uploadQueue.push(item); }
+        updateStatus();
+        await sleep(Math.min(3000 * item.attempts, 30000)); // attesa crescente, max 30s
+      }
+    }
+  } finally {
+    processing = false;
+  }
 }
-function updateRecordButton() {
-const btn = document.getElementById('recordBtn');
-const icon = document.getElementById('recordIcon');
-if (isRecording) {
-btn.classList.add('recording');
-icon.textContent = '⏹️';
-} else {
-btn.classList.remove('recording');
-icon.textContent = '🎤';
+
+async function uploadOne(fileName, mimeType, base64) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    // text/plain evita il preflight CORS che Apps Script non gestisce
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ secret: SHARED_SECRET, fileName, mimeType, fileData: base64 }),
+    redirect: 'follow'
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || 'upload fallito');
+  return json;
 }
+
+// ===================== UTILITÀ =====================
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1]);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
 }
-function updateTimer() {
-const el = document.getElementById('timer');
-el.textContent = (isRecording || recordingTime > 0) ? formatDuration(recordingTime) : '';
+
+function pickMime(strm) {
+  const cands = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2'];
+  for (const c of cands) {
+    try { if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(c)) return c; } catch (e) {}
+  }
+  try { return new MediaRecorder(strm).mimeType || ''; } catch (e) { return ''; }
 }
-function formatDuration(seconds) {
-const m = Math.floor(seconds / 60);
-const s = seconds % 60;
-return `${m}:${pad(s)}`;
+
+function extFor(m) {
+  m = (m || '').toLowerCase();
+  if (m.includes('webm')) return 'webm';
+  if (m.includes('ogg')) return 'ogg';
+  if (m.includes('mp4') || m.includes('m4a') || m.includes('aac') || m.includes('mpeg')) return 'm4a';
+  return 'webm';
 }
-function pad(n) { return String(n).padStart(2, '0'); }
-function showStatus(msg, type) {
-const el = document.getElementById('status');
-el.textContent = msg;
-el.classList.add('visible');
-el.classList.remove('success', 'warning');
-if (type === 'success') el.classList.add('success');
-if (type === 'warning') el.classList.add('warning');
+
+function timestamp() {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' +
+         p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
 }
-function clearStatus() {
-document.getElementById('status').classList.remove('visible', 'success', 'warning');
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function updateClock() {
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  const m = Math.floor(s / 60), sec = s % 60;
+  timerEl.textContent = String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
 }
-function showError(msg) {
-const el = document.getElementById('error');
-el.innerHTML = msg;
-el.classList.add('visible');
+
+function updateStatus() {
+  const pending = uploadQueue.length;
+  let html = savedCount + ' ' + (savedCount === 1 ? 'pezzo salvato' : 'pezzi salvati');
+  if (pending > 0) {
+    html += ' &middot; <span class="warn">' + pending + ' in attesa (riprovo da solo…)</span>';
+  } else if (!recording && savedCount > 0) {
+    html = '<span class="ok">Tutto salvato ✓ (' + savedCount + ' pezzi)</span>';
+  }
+  statusEl.innerHTML = recording || savedCount > 0 || pending > 0 ? html : '';
 }
-function clearError() {
-document.getElementById('error').classList.remove('visible');
-document.getElementById('error').innerHTML = '';
+
+// ===================== SCHERMO SVEGLIO =====================
+async function requestWakeLock() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
 }
+function releaseWakeLock() {
+  try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && recording) requestWakeLock();
+});
+
+// ===================== PROTEZIONE CHIUSURA =====================
+window.addEventListener('beforeunload', (e) => {
+  if (recording || uploadQueue.length > 0) { e.preventDefault(); e.returnValue = ''; }
+});
 </script>
 </body>
 </html>
