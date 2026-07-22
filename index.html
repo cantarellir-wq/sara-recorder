@@ -60,12 +60,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sa
 <div id="status" class="status"></div>
 <div id="error" class="error"></div>
 <div id="warning" class="warning" style="display:none"></div>
-<p class="footer">Versione 5.2 · Sara Recorder</p>
+<p class="footer">Versione 5.3 · Sara Recorder</p>
 </div>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygrMAaFAriearxpO1A248aueVhbD9mEeVwJXbDMJhuNAF63LGfRCgqAO-lAkaS-ij8/exec';
 const SHARED_SECRET = 'sara2026';
-const MAX_RETRIES = 4;
+const FOLDER_ID = '1HoFv2oRRn43evk5Cf8cvmCnyjoBeA3NI';
+const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB per chunk
 const urlParams = new URLSearchParams(window.location.search);
 const educatorId = urlParams.get('id') || '';
 const badge = document.getElementById('educatorBadge');
@@ -132,7 +133,6 @@ isRecording = false;
 clearInterval(timerInterval);
 updateRecordButton();
 if (stream) stream.getTracks().forEach(t => t.stop());
-releaseWakeLock();
 }
 }
 async function releaseWakeLock() {
@@ -157,91 +157,109 @@ const fileName = `Sara_${dateStr}_${timeStr}${idSuffix}.${ext}`;
 lastBlob = blob;
 lastFileName = fileName;
 lastMimeType = mimeType;
-await attemptUpload(blob, fileName, mimeType);
+// Mantieni Wake Lock attivo durante l'upload
+if ('wakeLock' in navigator && !wakeLock) {
+try {
+wakeLock = await navigator.wakeLock.request('screen');
+} catch (err) {
+console.warn('Screen Wake Lock non disponibile durante upload:', err);
 }
-async function attemptUpload(blob, fileName, mimeType) {
+}
+await attemptResumableUpload(blob, fileName, mimeType);
+}
+async function attemptResumableUpload(blob, fileName, mimeType) {
 document.getElementById('recordBtn').disabled = true;
 clearError();
 showStatus('Preparazione upload...');
 try {
-const base64Data = await blobToBase64(blob);
-await uploadWithRetry(base64Data, fileName, mimeType);
+// Step 1: Ottieni token
+showStatus('Richiesta autorizzazione...');
+const tokenResp = await fetch(SCRIPT_URL + '?action=mint-token&secret=' + encodeURIComponent(SHARED_SECRET));
+const tokenData = await tokenResp.json();
+if (!tokenData.success) {
+throw new Error('Impossibile ottenere token: ' + (tokenData.error || 'errore sconosciuto'));
+}
+const token = tokenData.token;
+// Step 2: Resumable upload
+showStatus('Caricamento in corso...');
+await resumableUploadToDrive(blob, fileName, mimeType, token);
 showStatus(`✅ Salvato: ${fileName}`, 'success');
 setTimeout(clearStatus, 5000);
 } catch (err) {
 console.error(err);
-showError(`❌ Salvataggio non riuscito dopo ${MAX_RETRIES} tentativi.<br>Il file resta pronto: puoi riprovare qui sotto.<br><button class="retry-btn" onclick="manualRetry()">Riprova ora</button>`);
-showStatus('⏳ In attesa — non chiudere la pagina se possibile', 'warning');
+showError(`❌ Salvataggio non riuscito.<br>${err.message}<br><button class="retry-btn" onclick="manualRetry()">Riprova ora</button>`);
 } finally {
+await releaseWakeLock();
 document.getElementById('recordBtn').disabled = false;
 recordingTime = 0;
 updateTimer();
 }
 }
+async function resumableUploadToDrive(blob, fileName, mimeType, token) {
+const fileSize = blob.size;
+let uploadedBytes = 0;
+// Step 1: Inizia sessione resumable
+const sessionResp = await fetch(
+'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
+{
+method: 'POST',
+headers: {
+'Authorization': `Bearer ${token}`,
+'X-Goog-Upload-Protocol': 'resumable',
+'X-Goog-Upload-Header-Content-Length': fileSize,
+'X-Goog-Upload-Header-Content-Type': mimeType,
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+name: fileName,
+mimeType: mimeType,
+parents: [FOLDER_ID]
+})
+}
+);
+if (!sessionResp.ok) {
+throw new Error(`Sessione upload fallita: ${sessionResp.status}`);
+}
+const sessionUri = sessionResp.headers.get('location');
+if (!sessionUri) {
+throw new Error('Nessun URI di sessione ricevuto');
+}
+// Step 2: Upload in chunk
+while (uploadedBytes < fileSize) {
+const chunkStart = uploadedBytes;
+const chunkEnd = Math.min(uploadedBytes + CHUNK_SIZE, fileSize);
+const chunk = blob.slice(chunkStart, chunkEnd);
+const chunkResp = await fetch(sessionUri, {
+method: 'PUT',
+headers: {
+'Content-Type': mimeType,
+'Content-Length': chunkEnd - chunkStart,
+'Content-Range': `bytes ${chunkStart}-${chunkEnd - 1}/${fileSize}`
+},
+body: chunk
+});
+if (chunkResp.status === 200 || chunkResp.status === 201) {
+// Upload completato
+uploadedBytes = fileSize;
+showStatus(`✅ Upload completato: ${fileName}`, 'success');
+} else if (chunkResp.status === 308) {
+// Continua upload
+const range = chunkResp.headers.get('range');
+if (range) {
+uploadedBytes = parseInt(range.split('-')[1]) + 1;
+} else {
+uploadedBytes = chunkEnd;
+}
+const percent = Math.round((uploadedBytes / fileSize) * 100);
+showStatus(`Caricamento: ${percent}%...`);
+} else {
+throw new Error(`Upload chunk fallito: ${chunkResp.status}`);
+}
+}
+}
 async function manualRetry() {
 if (!lastBlob) return;
-await attemptUpload(lastBlob, lastFileName, lastMimeType);
-}
-async function uploadWithRetry(base64Data, fileName, mimeType) {
-let attempt = 0;
-let lastErr = null;
-while (attempt < MAX_RETRIES) {
-attempt++;
-try {
-if (attempt > 1) {
-showStatus(`Tentativo ${attempt}/${MAX_RETRIES}...`);
-}
-await sendToScript(base64Data, fileName, mimeType);
-return;
-} catch (err) {
-lastErr = err;
-console.warn(`Tentativo ${attempt} fallito:`, err);
-if (attempt < MAX_RETRIES) {
-const backoff = Math.min(3000 * attempt, 15000);
-await wait(backoff);
-}
-}
-}
-throw lastErr;
-}
-function wait(ms) {
-return new Promise(resolve => setTimeout(resolve, ms));
-}
-function blobToBase64(blob) {
-return new Promise((resolve, reject) => {
-const reader = new FileReader();
-reader.onloadend = () => {
-const base64 = reader.result.split(',')[1];
-resolve(base64);
-};
-reader.onerror = reject;
-reader.readAsDataURL(blob);
-});
-}
-async function sendToScript(base64Data, fileName, mimeType) {
-const controller = new AbortController();
-const timeoutId = setTimeout(() => controller.abort(), 180000);
-try {
-const payload = { secret: SHARED_SECRET, fileName: fileName, mimeType: mimeType, fileData: base64Data };
-const response = await fetch(SCRIPT_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-body: JSON.stringify(payload),
-signal: controller.signal
-});
-clearTimeout(timeoutId);
-const result = await response.json();
-if (!result.success) {
-throw new Error(result.error || 'Errore sconosciuto');
-}
-return result;
-} catch (err) {
-clearTimeout(timeoutId);
-if (err.name === 'AbortError') {
-throw new Error('Timeout: upload troppo lento');
-}
-throw err;
-}
+await attemptResumableUpload(lastBlob, lastFileName, lastMimeType);
 }
 function updateRecordButton() {
 const btn = document.getElementById('recordBtn');
